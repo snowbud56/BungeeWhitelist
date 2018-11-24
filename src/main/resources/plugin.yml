@@ -1,4 +1,4 @@
-name: BungeeWhitelist
-version: 1.1
+name: ${project.name}
+version: ${project.version}
 author: snowbud56
 main: com.snowbud56.BungeeEssentials
