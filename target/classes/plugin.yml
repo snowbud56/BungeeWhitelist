@@ -1,5 +1,5 @@
-name: ${project.name}
-version: ${project.version}
+name: BungeeWhitelist
+version: 1.3-BM
 author: snowbud56
 softDepends: ["LuckPerms"]
 main: com.snowbud56.BungeeEssentials

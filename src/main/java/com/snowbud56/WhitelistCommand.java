@@ -5,8 +5,8 @@ import com.snowbud56.Utils.DataHandler;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.PendingConnection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.event.LoginEvent;
 import net.md_5.bungee.api.event.PreLoginEvent;
+import net.md_5.bungee.api.event.ProxyReloadEvent;
 import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.Listener;
@@ -46,6 +46,7 @@ public class WhitelistCommand extends Command implements Listener {
                 sender.sendMessage(ChatUtils.format(prefix + messagecolor + "Whitelist saved to disk"));
             }
             else if(args[0].equalsIgnoreCase("reload") && sender.hasPermission("bungeewhitelist.reload")){
+                DataHandler.loadFiles();
                 pluginEnable();
                 sender.sendMessage(ChatUtils.format(prefix + messagecolor + "Whitelist loaded from disk"));
             }
@@ -110,7 +111,7 @@ public class WhitelistCommand extends Command implements Listener {
                     if (!whitelisted.get("bungeeNetwork").contains(args[1])) sender.sendMessage(ChatUtils.format(prefix + messagecolor + "That player is not on the global whitelist!"));
                     else {
                         whitelisted.get("bungeeNetwork").remove(args[1]);
-                        sender.sendMessage(ChatUtils.format(prefix + "Added " + valuecolor + args[1] + messagecolor + " to the global whitelist!"));
+                        sender.sendMessage(ChatUtils.format(prefix + "Removed " + valuecolor + args[1] + messagecolor + " from the global whitelist!"));
                     }
                 } else {
                     String server = BungeeEssentials.getInstance().getProxy().getServerInfo(args[2]).getName();
@@ -163,13 +164,13 @@ public class WhitelistCommand extends Command implements Listener {
             return;
         ProxiedPlayer p = e.getPlayer();
         String server = e.getTarget().getName();
-        if (enabled.get("bungeeNetwork") && !whitelisted.get("bungeeNetwork").contains(p.getName())) {
+        if (enabled.get("bungeeNetwork") && !whitelisted.get("bungeeNetwork").contains(p.getName()) && !p.hasPermission("bungeewhitelist.bypass.bungeenetwork")) {
             e.setCancelled(true);
             p.disconnect(ChatUtils.format("&cKicked whilst connecting to " + server + ": " + kickmessage));
             return;
         }
         else if (enabled.get(server)) {
-            if (!(whitelisted.get(server).contains(p.getName()))) {
+            if (!(whitelisted.get(server).contains(p.getName())) && !p.hasPermission("bungeewhitelist.bypass." + server)) {
                 e.setCancelled(true);
                 p.sendMessage(ChatUtils.format("&cKicked whilst connecting to " + server + ": " + kickmessage));
             }
@@ -183,9 +184,15 @@ public class WhitelistCommand extends Command implements Listener {
             return;
         PendingConnection p = e.getConnection();
         if ((enabled.get("bungeeNetwork") && !whitelisted.get("bungeeNetwork").contains(p.getName())) ||
-                (enabled.get(p.getListener().getServerPriority().get(0)) &&
-                    !whitelisted.get(p.getListener().getServerPriority().get(0)).contains(p.getName()))) {
+            (enabled.get(p.getListener().getServerPriority().get(0)) &&
+                !whitelisted.get(p.getListener().getServerPriority().get(0)).contains(p.getName()))) {
             p.disconnect(ChatUtils.format("&cKicked whilst connecting to " + p.getListener().getServerPriority().get(0) + ": " + kickmessage));
         }
+    }
+
+    @EventHandler
+    public void onReload(ProxyReloadEvent e) {
+        DataHandler.loadFiles();
+        WhitelistCommand.pluginEnable();
     }
 }
