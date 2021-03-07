@@ -1,0 +1,5 @@
+name: ${project.name}
+version: ${project.version}
+author: snowbud56
+softDepends: ["LuckPerms"]
+main: com.snowbud56.BungeeEssentials

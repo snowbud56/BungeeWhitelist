@@ -6,6 +6,7 @@ import net.md_5.bungee.config.YamlConfiguration;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 public class DataHandler {
 
@@ -22,8 +23,9 @@ public class DataHandler {
             configuration.set("config.message-color", "&7");
             configuration.set("config.value-color", "&c");
             configuration.set("config.kick-message", "&fYou are not whitelisted!");
-            configuration.set("whitelist.global.enabled", false);
-            configuration.set("whitelist.global.whitelisted", blanklist);
+//            configuration.set("config.kick-fallback", "KickFallbackServerName");
+            configuration.set("whitelist.bungeeNetwork.whitelisted", blanklist);
+            configuration.set("whitelist.bungeeNetwork.enabled", false);
             for (String server : BungeeEssentials.getInstance().getProxy().getServers().keySet()) {
                 configuration.set("whitelist." + server + ".enabled", false);
                 configuration.set("whitelist." + server + ".whitelisted", blanklist);
@@ -34,22 +36,11 @@ public class DataHandler {
         }
     }
 
-    public static String getDefaultServer() {
+    public static String getKickFallbackServer() {
         Configuration config;
         try {
             config = YamlConfiguration.getProvider(YamlConfiguration.class).load(whitelistFile);
-            return config.getString("config.default-server");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static String getFallbackServer() {
-        Configuration config;
-        try {
-            config = YamlConfiguration.getProvider(YamlConfiguration.class).load(whitelistFile);
-            return config.getString("config.fallback-server");
+            return config.getString("config.kick-fallback");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -69,8 +60,9 @@ public class DataHandler {
         whitelistconfig.set("config.message-color", oldconfig.getString("config.message-color"));
         whitelistconfig.set("config.value-color", oldconfig.getString("config.value-color"));
         whitelistconfig.set("config.kick-message", oldconfig.getString("config.kick-message"));
-        whitelistconfig.set("whitelist.global.enabled", enabled.get("global"));
-        whitelistconfig.set("whitelist.global.whitelisted", whitelisted.get("global"));
+//        whitelistconfig.set("config.kick-fallback", oldconfig.getString("config.kick-fallback"));
+        whitelistconfig.set("whitelist.bungeeNetwork.enabled", enabled.get("bungeeNetwork"));
+        whitelistconfig.set("whitelist.bungeeNetwork.whitelisted", whitelisted.get("bungeeNetwork"));
         for (String server : enabled.keySet()) whitelistconfig.set("whitelist." + server + ".enabled", enabled.get(server));
         for (String server : whitelisted.keySet()) whitelistconfig.set("whitelist." + server + ".whitelisted", whitelisted.get(server));
         try {
